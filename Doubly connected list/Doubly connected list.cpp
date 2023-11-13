@@ -20,11 +20,6 @@
     Node(int val) = delete;
 };
 
-void shift(Node* head) {
-    Node* tmp = head;
-}
-
-
 struct Forward_List {
 public:
     Node* head;
@@ -59,10 +54,6 @@ public:
             tmp->prev = it;
             it->next = tmp;
             tail = tmp;
-            //            while (it->prev != nullptr) {
-            //                it = it->prev;
-            //            }
-            //            head = it;
         }
         size++;
     }
@@ -71,6 +62,7 @@ public:
         Node* tmp = new Node{};
         tmp->val = value;
         tmp->next = nullptr;
+        tmp->prev = nullptr;
 
         if (head == nullptr) {
             head = tmp;
@@ -85,48 +77,23 @@ public:
         size++;
     }
 
-    //    void pop_back() {
-    //        if (head == nullptr) return;
-    //
-    //        Node* it = tail->prev;
-    //        if (head->next == nullptr) {
-    //            delete head;
-    //            head = nullptr;
-    //            tail = nullptr;
-    //            }
-    //        else {
-    //            delete tail;
-    //            tail = it;
-    //            tail->next = nullptr;
-    //            tail->prev = it;
-    //        }
-    //        size--;
-    //    }
-
     void pop_back() {
         if (tail == nullptr) return;
-        Node* tmp = tail->prev;                         // предпоследний (предыдущий для хвоста)
-        if (tmp != nullptr) tmp->next = nullptr;        // если предыдущий элемент у хвоста существует, то отвязываю хвост от предыдущего
-        else head = nullptr;                            // если предыдущего элемента у хвоста нет, то список из 1 элемента,
-        // который сейчас будет удален. Значит голова списка станет nullptr.
+        Node* tmp = tail->prev;                         
+        if (tmp != nullptr) tmp->next = nullptr;        
+        else head = nullptr;                            
         delete tail;
         tail = tmp;
         size--;
     }
 
-
     void pop_front() {
         if (head == nullptr) return;
-
-        if (head->next == nullptr) {
-            delete head;
-            return;
-        }
-        else {
-            Node* it = head->next;
-            delete head;
-            head = it;
-        }
+        Node* tmp = head->next;                         
+        if (tmp != nullptr) tmp->prev = nullptr;        
+        else head = nullptr;  
+        delete head;
+        head = tmp;
         size--;
     }
 
@@ -142,19 +109,22 @@ public:
             count = 0;
             if (posithion == 0) {
                 it = it->next;
+                it->prev = nullptr;
                 delete head;
                 head = it;
-                return;
             }
-            while (count != posithion) {
-                if (count == posithion - 1) tmp = it;
-                it = it->next;
-                count++;
+            else {
+                while (count != posithion) {
+                    if (count == posithion - 1) tmp = it;
+                    it = it->next;
+                    count++;
+                }
+                tmp->next = it->next;
+                tmp = tmp->next;
+                tmp->prev = it->prev;
+                it = nullptr;
+                delete it;
             }
-            tmp->next = it->next;
-            tmp = tmp->next;
-            tmp->prev = it->prev;
-            delete it;
         }
 
         if (posithion > size / 2) {
@@ -162,19 +132,22 @@ public:
             count = size - 1;
             if (posithion == size - 1) {
                 it = it->prev;
+                tail = nullptr;
                 delete tail;
                 tail = it;
-                return;
             }
-            while (count != posithion) {
-                if (count == posithion + 1) tmp = it;
-                it = it->prev;
-                count--;
+            else {
+                while (count != posithion) {
+                    if (count == posithion + 1) tmp = it;
+                    it = it->prev;
+                    count--;
+                }
+                tmp->prev = tmp->prev->prev;
+                tmp = tmp->prev;
+                tmp->next = tmp->next->next;
+                it = nullptr;
+                delete it;
             }
-            tmp->prev = it->prev;
-            tmp = tmp->prev;
-            tmp->next = it->next;
-            delete it;
         }
     }
 
@@ -186,49 +159,52 @@ public:
         Node* tmp = new Node{};
         tmp->val = value;
         tmp->next = nullptr;
+        tmp->prev = nullptr;
+
 
         Node* it{};
         int count;
 
-        //        if (posithion <= size / 2) {
-        it = head;
-        count = 0;
-        if (posithion == 0) {
-            it = it->next;
-            delete head;
-            head = it;
-            return;
+        if (posithion <= size / 2) {
+            it = head;
+            count = 0;
+            if (posithion == 0) {
+                it = it->next;
+                head = tmp;
+                tmp = it;
+            }
+            else {
+                while (count != posithion) {
+                    it = it->next;
+                    count++;
+                }
+                tmp->next = it;
+                tmp->prev = it->prev;
+                it->prev = tmp;
+                tmp->prev->next = tmp;
+            }
         }
-        while (count != posithion) {
-            it = it->next;
-            count++;
-        }
-        tmp->next = it;
-        tmp->prev = it->prev;
-        it->prev = tmp;
-        tmp->prev->next = tmp;
-        //        }
 
-        //        if (posithion > size / 2) {
-        //            it = tail;
-        //            count = size - 1;
-        //            if (posithion == size - 1) {
-        //                it = it->prev;
-        //                delete tail;
-        //                tail = it;
-        //                return;
-        //            }
-        //            while (count != posithion) {
-        //                if (count == posithion + 1) tmp = it;
-        //                it = it->prev;
-        //                count--;
-        //            }
-        //            tmp->next = it;
-        //            tmp->prev = it->prev;
-        //            it->prev = tmp;
-        //            tmp->prev->next = tmp;
-        //            delete it;
-        //        }
+        if (posithion > size / 2) {
+            it = tail;
+            count = size - 1;
+            if (posithion == size - 1) {
+                it = it->prev;
+                tmp->prev = it;
+                tail = tmp;
+            }
+            else {
+                while (count != posithion) {
+                    if (count == posithion + 1) tmp = it;
+                    it = it->prev;
+                    count--;
+                }
+                tmp->next = it;
+                tmp->prev = it->prev;
+                it->prev = tmp;
+                tmp->prev->next = tmp;
+            }
+        }
     }
 
     Node* at(int index) const {
@@ -244,13 +220,6 @@ public:
     // operator[]
     Node* operator[] (int index) {
         return at(index);
-        //        if (head == nullptr || index < 0 || index >= size) return nullptr;
-        //        int i = 0;
-        //        Node* tmp = head;
-        //        while (i++ < index) {
-        //            tmp = tmp->next;
-        //        }
-        //        return tmp;
     }
 
     void shift_right(int num_pos) {
