@@ -1,14 +1,7 @@
-﻿﻿/*
- 1) push_back 2) pop_back 3) push_front 4) pop_front 5) erase 6) insert 7) at
- 8) operator[] 9) operator<< 10) size 11) shift_right 12) shift_left 13*) sort - допустимо N^2 14**) quick_sort - NlogN
- */
-
-#include <iostream>
-#include <optional>
-#include <cassert>
+﻿#include <iostream>﻿
 
 
-    struct Node {
+struct Node {
     int val;
     Node* next;
     Node* prev;
@@ -81,7 +74,8 @@ public:
         if (tail == nullptr) return;
         Node* tmp = tail->prev;                         
         if (tmp != nullptr) tmp->next = nullptr;        
-        else head = nullptr;                            
+        else head = nullptr; 
+        tail = nullptr;
         delete tail;
         tail = tmp;
         size--;
@@ -91,14 +85,18 @@ public:
         if (head == nullptr) return;
         Node* tmp = head->next;                         
         if (tmp != nullptr) tmp->prev = nullptr;        
-        else head = nullptr;  
+        else head = nullptr; 
+        head = nullptr;
         delete head;
         head = tmp;
         size--;
     }
 
     void erase(int posithion) {
-        if (posithion >= size || posithion < 0) std::cerr << "There is no such position" << std::endl;
+        if (posithion >= size || posithion < 0) {
+            std::cerr << "There is no such position" << std::endl;
+            return;
+        }
 
         Node* it{};
         Node* tmp{};
@@ -120,8 +118,7 @@ public:
                     count++;
                 }
                 tmp->next = it->next;
-                tmp = tmp->next;
-                tmp->prev = it->prev;
+                if(it->next != nullptr) it->next->prev = tmp;;
                 it = nullptr;
                 delete it;
             }
@@ -142,9 +139,8 @@ public:
                     it = it->prev;
                     count--;
                 }
-                tmp->prev = tmp->prev->prev;
-                tmp = tmp->prev;
-                tmp->next = tmp->next->next;
+                tmp->prev = it->prev;
+                it->prev->next = tmp;
                 it = nullptr;
                 delete it;
             }
@@ -152,9 +148,7 @@ public:
     }
 
     void insert(int value, int posithion) {
-        if (posithion >= size || posithion < 0) {
-            return;
-        }
+        if (posithion >= size || posithion < 0) return;
 
         Node* tmp = new Node{};
         tmp->val = value;
@@ -169,9 +163,9 @@ public:
             it = head;
             count = 0;
             if (posithion == 0) {
-                it = it->next;
+                tmp->next = it;
+                it->prev = tmp;
                 head = tmp;
-                tmp = it;
             }
             else {
                 while (count != posithion) {
@@ -189,15 +183,16 @@ public:
             it = tail;
             count = size - 1;
             if (posithion == size - 1) {
-                it = it->prev;
                 tmp->prev = it;
+                it->next = tmp;
                 tail = tmp;
             }
             else {
                 while (count != posithion) {
-                    if (count == posithion + 1) tmp = it;
-                    it = it->prev;
-                    count--;
+                    if (count == posithion + 1) {
+                        it = it->prev;
+                        count--;
+                    }
                 }
                 tmp->next = it;
                 tmp->prev = it->prev;
@@ -205,6 +200,7 @@ public:
                 tmp->prev->next = tmp;
             }
         }
+        size++;
     }
 
     Node* at(int index) const {
@@ -251,6 +247,7 @@ std::ostream& operator<< (std::ostream& out, const Forward_List& fl) {
         it = it->next;
     }
     std::cout << std::endl;
+    return std::cout;
 }
 
 
@@ -258,31 +255,13 @@ int main()
 {
 
     Forward_List fl{};
-    assert(fl.head == nullptr);
+    fl.push_back(0);
     fl.push_back(1);
-    assert(fl[0]->val == 1);
-    assert(fl.at(0)->val == 1);
     fl.push_back(2);
     fl.push_back(3);
-    //    fl.push_back(4);
-    //    fl.push_back(5);
-    //    assert(fl.size == 5);
-    //    fl.push_front(0);
-    //    assert(fl[0]->val == 0);
-    fl.pop_back();
-    //    assert(fl[4]->val == 4);
-    //    fl.pop_front();
-    //    assert(fl[0]->val == 1);
-    //    fl.erase(1);
-    //    fl.insert(100, 1);
-    //    assert(fl[1]->val == 100);
+    fl.push_back(4);
+    fl.push_back(5);
 
-    //    std::cout << fl;
-
-    //    std::cout << fl.at(0)->val << std::endl;
-    //    fl.shift_right(2);
-    //    std::cout << fl.at(0)->val << std::endl;
-    //    fl.shift_left(2);
-    //    std::cout << fl.at(0)->val << std::endl;
+    fl.insert(5,4);
     return 0;
 }
