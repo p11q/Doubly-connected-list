@@ -238,11 +238,26 @@ public:
             tail = tail->prev;
         }
     }
+
+    void sort() {
+        for (int i = 0; i < size; i++) {
+            Node* it = at(i);
+            for (int j = i; j < size; j++) {
+                Node* jt = at(j);
+                if (it->val > jt->val) {
+                    Node* tmp = it;
+                    it->next = jt->next;
+                    it->prev = jt->prev;
+                    jt = tmp;
+                }
+          }
+        }
+    }
 };
 
 std::ostream& operator<< (std::ostream& out, const Forward_List& fl) {
     Node* it = fl.head;
-    while (it->next != nullptr) {
+    for (int i = 0; i < fl.size; i++) {
         std::cout << it->val << " ";
         it = it->next;
     }
@@ -251,17 +266,22 @@ std::ostream& operator<< (std::ostream& out, const Forward_List& fl) {
 }
 
 
+
+
 int main()
 {
 
     Forward_List fl{};
     fl.push_back(0);
+    fl.push_back(8);
     fl.push_back(1);
-    fl.push_back(2);
     fl.push_back(3);
-    fl.push_back(4);
+    fl.push_back(9);
     fl.push_back(5);
+    std::cout << fl;
+    fl.sort();
+    std::cout << fl;
+    
 
-    fl.insert(5,4);
     return 0;
 }
