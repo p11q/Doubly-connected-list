@@ -245,10 +245,17 @@ public:
             for (int j = i; j < size; j++) {
                 Node* jt = at(j);
                 if (it->val > jt->val) {
-                    jt->prev = it->prev;
-                    it->prev->next = jt;
+                    if (j == size - 1) {
+                        it->next = jt->next;
+                        jt->prev = it->prev;
+                        it->prev->next = jt;
+                        jt->next = it;
+                        it->prev = jt;
+                    }
                     it->next = jt->next;
                     jt->next->prev = it;
+                    jt->prev = it->prev;
+                    it->prev->next = jt;
                     jt->next = it;
                     it->prev = jt;
                 }
