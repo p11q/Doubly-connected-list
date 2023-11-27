@@ -244,6 +244,8 @@ public:
             Node* it = at(i);
             for (int j = i; j < size; j++) {
                 Node* jt = at(j);
+                if (it->val < jt->val) { break; }
+
                 if (it->val > jt->val) {
                     if (j == size - 1) {
                         it->next = jt->next;
@@ -252,12 +254,14 @@ public:
                         jt->next = it;
                         it->prev = jt;
                     }
-                    it->next = jt->next;
-                    jt->next->prev = it;
-                    jt->prev = it->prev;
-                    it->prev->next = jt;
-                    jt->next = it;
-                    it->prev = jt;
+                    else {
+                        it->next = jt->next;
+                        jt->next->prev = it;
+                        jt->prev = it->prev;
+                        it->prev->next = jt;
+                        jt->next = it;
+                        it->prev = jt;
+                    }
                 }
           }
         }
